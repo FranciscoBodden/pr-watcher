@@ -7,7 +7,7 @@ on:
 jobs:
   watch-pr:
     runs-on: ubuntu-latest
-
+    if: github.event.pull_request.merged == false
     steps:
       - name: Check PR status in a loop
         env:
@@ -16,21 +16,12 @@ jobs:
           REPO: ${{ github.repository }}
         run: |
           echo "Watching PR #$PR_NUMBER"
-
-          for i in {1..30}; do
-            STATE=$(curl -s \
-              -H "Authorization: token $GH_TOKEN" \
-              https://api.github.com/repos/$REPO/pulls/$PR_NUMBER \
-              | jq -r '.state')
-
-            echo "Current PR state: $STATE"
-
-            if [ "$STATE" = "closed" ]; then
-              echo "hello"
-              exit 0
-            fi
-
-            sleep 10
-          done
-
           echo "PR never closed during execution"
+  post-check:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == false
+    steps:
+      - name: hola
+        run: |
+          echo "hola"
+    
