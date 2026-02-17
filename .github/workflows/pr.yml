@@ -1,4 +1,4 @@
-name: PR watcher 
+name: PR watcher  
 
 on:
   pull_request:
