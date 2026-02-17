@@ -9,7 +9,25 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.pull_request.state == 'open'
     steps:
+    
+      - name: Check if PR is still open
+        id: check_pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          STATE=$(gh pr view $PR_NUMBER --repo $REPO --json state -q .state)
+          echo "Current PR state: $STATE"
+  
+          if [ "$STATE" = "OPEN" ]; then
+            echo "open=true" >> $GITHUB_OUTPUT
+          else
+            echo "open=false" >> $GITHUB_OUTPUT
+          fi
+      
       - name: Check PR status in a loop
+        if: steps.check_pr.outputs.open == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
@@ -23,7 +41,24 @@ jobs:
     needs: [watch-pr]
     if: github.event.pull_request.state == 'open'
     steps:
+      - name: Check if PR is still open
+        id: check_pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          STATE=$(gh pr view $PR_NUMBER --repo $REPO --json state -q .state)
+          echo "Current PR state: $STATE"
+  
+          if [ "$STATE" = "OPEN" ]; then
+            echo "open=true" >> $GITHUB_OUTPUT
+          else
+            echo "open=false" >> $GITHUB_OUTPUT
+          fi
+          
       - name: hola
+        if: steps.check_pr.outputs.open == 'true'
         run: |
           echo "hola"
     
